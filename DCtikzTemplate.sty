@@ -1,0 +1,453 @@
+%DCtikz.sty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%死亡診断書マクロファイル
+%2024.6 FUKUTA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{luatexja-otf}
+\usepackage{anyfontsize}
+\usepackage{ifthen}
+\usetikzlibrary {arrows.meta}%矢印
+\usetikzlibrary{decorations,decorations.pathreplacing}%中括弧
+
+%%%%%%%均等割付%%%%%%%%%
+\def\kintou#1#2{\leavevmode\hbox to#1{%
+\ltjsetparameter{kanjiskip=0pt plus 1fill minus 1fill}
+\ltjsetparameter{xkanjiskip=\ltjgetparameter{kanjiskip}}
+#2}}
+%%%
+%%%%%%%%%%カウンタ
+\newcount\場所種別
+\newcount\施設別
+\newcount\死因種類
+\newcount\発生場所種別
+\newcount\都道府県
+\newcount\市郡
+\newcount\区町村
+\newcount\母体病態
+%%%%%%%%%%テンプレートの記載
+\def\template{
+ \path[use as bounding box] (0,0) rectangle (210,297);%A4サイズ指定
+\node at (89,283) {\Large 死亡診断書（死体検案書）};
+\node at (89,273) {\footnotesize この死亡診断書（死体検案書）は、我が国の死因統計作成の資料としても用いられます。楷書で、できるだけ詳しく書いてください。};
+\node[anchor=west,draw,thick] at (178,273) {\textbf{記入の注意}};
+%枠線
+\draw[thick] (9,14) rectangle (169,271);
+%縦線
+\draw (34,56)--(34,271);
+\draw (43,141)--(43,212);
+\draw (53,92)--(53,119);
+\draw (63,163)--(63,244);
+\draw (74,76)--(74,83);
+\draw (74,253)--(74,271);
+\draw (86,253)--(86,271);
+\draw (100,56)--(100,76);
+\draw (100,253)--(100,271);
+\draw (129,150)--(129,212);
+\draw (135,56)--(135,83);
+\draw (145,150)--(145,212);
+%横線
+\foreach \y in {47, 56, 83, 119,141, 212, 244, 253} {\draw (9,\y)--(169,\y);}
+\foreach \y in {76, 92, 101, 110, 150, 163, 225, 235} {\draw (34,\y)--(169,\y);}
+\foreach \y in {177, 186, 194, 203} {\draw (43,\y)--(129,\y);}
+\foreach \y in {177, 186, 194, 203} {\draw (145,\y)--(169,\y);}
+\draw (34,177)--(43,177);
+%枠内
+{\small
+\node[anchor=west] at (10.5,262) {氏　　　　 名};
+\node[anchor=west] at (9,248.5) {\kintou{7.5\zw}{死亡したとき}};
+\node[anchor=west] at (9,232) {\kintou{7.5\zw}{死亡したところ}};
+\node[anchor=west] at (9,225) {\kintou{7.5\zw}{及びその種別}};
+\node[anchor=west] at (9,205) {\kintou{7.5\zw}{死亡の原因}};
+\node[anchor=west] at (9,130) {\kintou{7.5\zw}{死因の種類}};
+\node[anchor=west] at (9,112) {\kintou{7.5\zw}{外因死の}};
+\node[anchor=west] at (9,108) {\kintou{7.5\zw}{追加事項}};
+\node[anchor=north west, align=left] at (9.5,99) {◆伝聞又は推定\\情報の場合でも\\書いてください};
+}
+{\footnotesize 
+\node[anchor=west] at (9,75.5) {\kintou{8.5\zw}{生後1年未満で}};
+\node[anchor=west] at (9,70) {\kintou{8.5\zw}{病死した場合の}};
+\node[anchor=west] at (9,64) {\kintou{8.5\zw}{追加事項}};
+}
+{\fontsize{6}{7}\selectfont 
+\node[anchor=north west, align=left] at (9.5,193) {◆I欄、I\hspace{-1.2pt}I欄ともに疾患\\の終末期の状態としての\\心不全、呼吸不全等は書\\かないでください};
+\node[anchor=north west, align=left] at (9.5,181) {◆I欄では、最も死亡に\\影響を与えた傷病名を医\\学的因果関係の順番で書\\いてください};
+\node[anchor=north west, align=left] at (9.5,168) {◆I欄の傷病名の記載は\\各欄一つにしてください};
+\node[anchor=north west, align=left] at (9.5,160) {　ただし、欄が不足する\\場合は（エ）欄に残りを\\医学的因果関係の順番で\\書いてください};
+}
+{\small 
+\node[align=center] at (80,262) {1男\\2女};
+\node[anchor=west] at (86,262) {生年月日};
+\node[anchor=north west, align=left] at (100,271) {明治　昭和\\大正　平成　令和};
+\node[anchor=east] at (169,267) {年　　　月　　　日};
+\node[anchor=east] at (169,257) {午前・午後　　時　　分};
+\node[anchor=west, align=left] at (130,230) {番　地\\[3]番　　　　号};
+\node at (38,195) {I};
+\node at (38,170) {I\hspace{-1.2pt}I};
+}
+{\tiny
+\node[anchor=south west, align=left] at (101,254) {生まれてから30日以内に死亡したと\\きは生まれた時刻も書いてください};
+}
+\draw[rounded corners=1pt] (101.5,260)--(101,260)--(101,254)--(101.5,254);
+\draw[rounded corners=1pt] (131.5,260)--(132,260)--(132,254)--(131.5,254);
+{\small 
+\node[anchor=west] at (34,248.5) {令和　　　　年　　　　月　　　　日　　　　　午前・午後　　　　時　　　　分};
+}
+{\footnotesize 
+\node[anchor=west] at (34,239.5) {死亡したところの種別};
+\node[anchor=west] at (34,230) {\kintou{10\zw}{死亡したところ}};
+\node[anchor=west] at (34,216) {\kintou{10\zw}{施設の名称}};
+\node[anchor=east] at (168,219) {（\hspace{10\zw}）};
+\node[align=center] at (38,156) {手\\術};
+\node[anchor=west] at (45,156) {1\hspace{-0.1pt}無　2\hspace{-0.1pt}有};
+\node[anchor=west] at (129,156) {手術年月日};
+\node[anchor=west, align=left] at (144.5,156) {令和\\平成\\昭和};
+\node[anchor=east] at (169.5,156) {年　月　日};
+\node[align=center] at (38,145.5) {解\\剖};
+\node[anchor=west] at (45,145.5) {1\hspace{-0.1pt}無　2\hspace{-0.1pt}有};
+}
+{\scriptsize
+\node[anchor=west] at (63,239.5) {1\hspace{-0.1pt}病院　2\hspace{-0.1pt}診療所　3\hspace{-0.1pt}介護医療院・介護老人保健施設　4\hspace{-0.1pt}助産所　5\hspace{-0.1pt}老人ホーム　6\hspace{-0.1pt}自宅　7\hspace{-0.1pt}その他};
+}
+{\fontsize{6}{7}\selectfont
+\node[anchor=west] at (34,222) {（死亡したところの種別1～5）};
+\node[anchor=west] at (43,208) {\kintou{9\zw}{（~ア~）直接死因}};
+\node[anchor=west] at (43,199) {（~イ~）\hspace{-0.1pt}（~ア~）の原因};
+\node[anchor=west] at (43,190) {（~ウ~）\hspace{-0.1pt}（~イ~）の原因};
+\node[anchor=west] at (43,181) {（~エ~）\hspace{-0.1pt}（~ウ~）の原因};
+\node[anchor=north west, align=left] at (43,175) {直接には死因に関係\\しないがI欄の傷病\\経過に影響を及ぼし\\た傷病名};
+\node[anchor=north west, align=left] at (130,209) {発病（発症）\\又は受傷から\\死亡までの期\\間\\
+◆年、月、日\\等の単位で書\\いてください\\
+　ただし、1\\日未満の場合\\は、時、分等\\の単位で書い\\てください\\
+（例：1年、\\3ヵ月、5時\\間20分）};
+}
+{\tiny
+\node[anchor=west] at (62,161) {部位及び主要所見};
+\node[anchor=west] at (62,148) {主要所見};
+}
+\draw[decorate,decoration={brace}](62,151)--(62,162);
+\draw[decorate,decoration={brace}](118,162)--(118,151);
+\draw[decorate,decoration={brace}](62,142)--(62,149);
+\draw[decorate,decoration={brace}](165,149)--(165,142);
+{\scriptsize
+\node[anchor=west] at (34,137) {1病死及び自然死};
+\node[anchor=west] at (36,129) {外因死};
+\node[anchor=west] at (55,132.5) {不慮の外因死};
+\node[anchor=west] at (76,134) {2交通事故　3転倒・転落　4溺水　5煙、火災及び火焔による傷害};
+\node[anchor=west] at (76,131) {6窒息　7中毒　8その他};
+\node[anchor=west] at (55,125) {その他及び不詳の外因死};
+\node[anchor=west] at (87,125) {9自殺　10他殺　11その他及び不詳の外因};
+\node[anchor=west] at (34,121) {12不詳の死};
+}
+\draw[decorate,decoration={brace}](75,128)--(75,138);
+\draw[decorate,decoration={brace}](156,138)--(156,128);
+\draw[decorate,decoration={brace}](86,122)--(86,128);
+\draw[decorate,decoration={brace}](139,128)--(139,122);
+{\scriptsize
+\node[anchor=north west, align=left] at (34,118) {傷害が発生した\\とき};
+\node[anchor=north west, align=left] at (34,109) {傷害が発生した\\ところの種別};
+\node[anchor=north west, align=left] at (34,100) {傷害が発生した\\ところ};
+\node[anchor=north west] at (34,92) {手段及び状況};
+\node[anchor=west] at (53,114) {令和・平成・昭和　　　年　　　月　　　日　　午前・午後　　　時　　　　分};
+\node[anchor=west] at (53,105) {1\hspace{-0.1pt}住居　2\hspace{-0.1pt}工場及び建築現場　3\hspace{-0.1pt}道路　4\hspace{-0.1pt}その他（\hspace{20\zw}）};
+\node[align=center] at (77,96) {都道\\[3]府県};
+\node[align=center] at (108,96) {市\\[3]郡};
+\node[align=center] at (133,96) {区\\[3]町村};
+%
+\node[anchor=north west] at (34,83) {出生時体重};
+\node[anchor=south east] at (74,76) {グラム};
+\node[anchor=north west] at (74,83) {単胎・多胎の別};
+\node[anchor=south east] at (135,76) {1\hspace{-0.1pt}単胎　2\hspace{-0.1pt}多胎（　　子中第　　子）};
+\node[anchor=north west] at (135,83) {妊娠週数};
+\node[anchor=south east] at (167,76) {満　　　週};
+\node[anchor=north west] at (34,76) {妊娠・分娩時における母体の病態又は異状};
+\node[anchor=west] at (34,64) {1\hspace{-0.1pt}無　2\hspace{-0.1pt}有};
+\node[anchor=east] at (100,64) {3\hspace{-0.1pt}不詳};
+\draw[rounded corners=2pt] (50,70)--(49,70)--(49,58)--(50,58);
+\draw[rounded corners=2pt] (91,70)--(92,70)--(92,58)--(91,58);
+\node[anchor=north west] at (100,76) {母の生年月日};
+\node[anchor=west, align=left] at (100,64) {昭和\\[3]平成\\[3]令和};
+\node[anchor=east] at (135,64) {年　　月　　日};
+\node[anchor=north west] at (135,76) {前回までの妊娠の結果};
+\node[anchor=west, align=left] at (142,67) {出生児\\[3]死産児};
+\node[anchor=east, align=left] at (167,67) {人\\[3]胎};
+\node[anchor=south west] at (137,56) {（妊娠満22週以後に限る）};
+%
+\node[anchor=north west] at (9,56) {その他特に付言すべきことがら};
+\node[anchor=north west] at (14,46) {上記のとおり診断（検案）する};
+\node[anchor=west, align=left] at (14,32) {病院、診療所、介護医療院若しく\\は介護老人保健施設等の名称及び\\所在地又は医師の住所};
+\draw[rounded corners=2pt] (13,38)--(12,38)--(12,27)--(13,27);
+\draw[rounded corners=2pt] (54,38)--(55,38)--(55,27)--(54,27);
+\node[anchor=east] at (167,44) {診断（検案）年月日　令和　　　年　　　月　　　日};
+\node[anchor=east] at (167,41) {本診断書（検案書）発行年月日　令和　　　年　　　月　　　日};
+\node[anchor=west, align=left] at (135,34) {番地\\[3]番　　　　　号};
+\node[anchor=west] at (25,21) {（氏名）　　　　　医師};
+}
+%欄外
+{\fontsize{6}{7}\selectfont
+\node[anchor=north west, align=left] at (176,269) {生年月日が不詳の場合は、推\\定年齢をカッコを付して書い\\てください。};
+\node[anchor=north west, align=left] at (176,257) {夜の\hspace{-0.1pt}12\hspace{-0.1pt}時は「午前\hspace{-0.1pt}0\hspace{-0.1pt}時」、昼\\の\hspace{-0.1pt}12\hspace{-0.1pt}時は「午後\hspace{-0.1pt}0\hspace{-0.1pt}時」と書い\\てください。};
+\node[anchor=north west, align=left] at (176,244) {「5\hspace{-0.1pt}老人ホーム」は養護老人\\ホーム、特別養護老人ホー\\ム、軽費老人ホーム及び有料\\老人ホームをいいます。};
+\node[anchor=north west, align=left] at (176,229) {死亡したところの種別で「3\hspace{-0.1pt}介\\護医療院・介護老人保健施\\設」を選択した場合は、施設\\の名称に続けて、介護医療\\院、介護老人保健施設の別を\\カッコ内に書いてください。};
+\node[anchor=north west, align=left] at (176,209) {傷病名等は、日本語で書いて\\ください。\\I\hspace{-0.1pt}欄では、各傷病名について\\
+・発病の型（例：急性）\\・病因（例：病原体名）\\・部位（例：胃噴門部がん）\\・性状（例：病理組織型）\\等もできるだけ書いてくださ\\い。};
+\node[anchor=north west, align=left] at (176,180) {妊娠中の死亡の場合は「妊娠\\満何週」、また、分娩中の死\\亡の場合は「妊娠満何週の分\\娩中」と書いてください。\\
+産後\hspace{-0.1pt}1\hspace{-0.1pt}年未満の死亡の場合は\\「妊娠満何週、産後満何日」\\と書いてください。};
+\node[anchor=north west, align=left] at (176,156) {I\hspace{-0.1pt}欄および\hspace{-0.1pt}I\hspace{-1.2pt}I\hspace{-0.1pt}欄に関係した手術\\について、術式及びその診断\\名と関連のある所見等を書い\\てください。紹介状や伝聞等\\による情報についてもカッコ\\を付して書いてください。};
+\node[anchor=north west, align=left] at (176,132) {「2\hspace{-0.1pt}交通事故」は事故発生か\\らの期間にかかわらず、その\\事故による死亡が該当します。\\
+「5\hspace{-0.1pt}煙、火災、火焔による傷\\害」は、火災による一酸化炭\\素中毒、窒息等も含まれま\\す。};
+\node[anchor=north west, align=left] at (176,107) {「1\hspace{-0.1pt}住居」とは、住宅、庭等を\\いい、老人ホーム等の居住施\\設は含まれません。};
+\node[anchor=north west, align=left] at (176,92) {傷害がどういう状況で起こっ\\たか具体的に書いてくださ\\い。};
+\node[anchor=north west, align=left] at (176,80) {妊娠週数は、最終月経、基礎\\体温、超音波計測等により推\\定し、できるだけ正確に書い\\てください。};
+\node[anchor=north west, align=left] at (176,66) {母子健康手帳等を参考に書い\\てください。};
+\node[anchor=north west, align=left] at (176,25) {氏名の欄には、医師本人が署\\名してください。\\記名押印は原則不可です。};
+}
+\foreach \y in {267,242,219,177,153,131,106,89,78,22}{\draw[{Latex[scale=1.2]}-] (169,\y)--(175,\y);}
+\draw[decorate,decoration={brace}](174,258)--(174,248);
+\draw[decorate,decoration={brace}](174,212)--(174,185);
+\draw[decorate,decoration={brace,aspect=0.7}](173,83)--(173,56);
+}%template
+
+%%%%%%%%%%%%入力部
+\def\body{
+\ifthenelse{\equal{\書類別}{S}}{%
+  \draw[double distance=1] (88,283)--(116,283);
+  \draw[double distance=1] (35.5,44)--(42,44);
+  \draw[double distance=1] (115.5,44)--(122.5,44);
+  \draw[double distance=1] (108,41)--(118,41);
+}{%
+  \ifthenelse{\equal{\書類別}{K}}{%
+    \draw[double distance=1] (60,283)--(86,283);
+    \draw[double distance=1] (28.5,44)--(34.5,44);
+    \draw[double distance=1] (108.5,44)--(115,44);
+    \draw[double distance=1] (100.5,41)--(108,41);
+  }{}
+}
+%
+\node[anchor=west] at (37,261) {\Large \氏名};
+\ifthenelse{\equal{\性別}{1}}{
+  \draw (80,264) circle[x radius=3.5, y radius=2.5];
+}{
+  \ifthenelse{\equal{\性別}{2}}{
+    \draw (80,260) circle[x radius=3.5, y radius=2.5];
+  }{}
+}
+%
+\ifthenelse{\equal{\生年号}{M}}{
+  \draw (104,268) circle[x radius=3.5, y radius=2.5];}{
+\ifthenelse{\equal{\生年号}{T}}{
+  \draw (104,264.5) circle[x radius=3.5, y radius=2.5];}{
+\ifthenelse{\equal{\生年号}{S}}{
+  \draw (113,268) circle[x radius=3.5, y radius=2.5];}{
+\ifthenelse{\equal{\生年号}{H}}{
+  \draw (113,264.5) circle[x radius=3.5, y radius=2.5];}{
+\ifthenelse{\equal{\生年号}{R}}{
+  \draw (123,264.5) circle[x radius=3.5, y radius=2.5];}{}
+}}}}
+\ifthenelse{\equal{\生年号}{U}}{
+  \node[anchor=west] at (138,264) {\推定年齢（推定）};
+}{
+  \node[anchor=east] at (139,267) {\生年};
+  \node[anchor=east] at (153,267) {\生月};
+  \node[anchor=east] at (165,267) {\生日};
+}
+
+%
+\ifthenelse{\equal{\出生AP}{A}}{
+  \draw (137.5,257) circle[x radius=3.5, y radius=2.5];
+}{
+  \ifthenelse{\equal{\出生AP}{P}}{
+    \draw (147,257) circle[x radius=3.5, y radius=2.5];
+  }{}
+}
+\node[anchor=east] at (156.5,257) {\出生時};
+\node[anchor=east] at (165.5,257) {\出生分};
+%
+\node[anchor=east] at (51,248.5) {\死亡年};
+\node[anchor=east] at (67,248.5) {\死亡月};
+\node[anchor=east] at (83,248.5) {\死亡日};
+\ifthenelse{\equal{\死亡AP}{A}}{
+  \draw (105,248.5) circle[x radius=3.5, y radius=2.5];
+}{
+  \ifthenelse{\equal{\死亡AP}{P}}{
+    \draw (113,248.5) circle[x radius=3.5, y radius=2.5];
+  }{}
+}
+\node[anchor=east] at (128,248.5) {\死亡時};
+\node[anchor=east] at (144,248.5) {\死亡分};
+\ifthenelse{\equal{\死亡時推定}{1}}{
+  \node[anchor=west] at (152,248.5) {（推定）};}{
+\ifthenelse{\equal{\死亡時推定}{2}}{
+  \node[anchor=west] at (152,248.5) {頃};}{
+\ifthenelse{\equal{\死亡時推定}{3}}{
+  \node[anchor=west] at (152,248.5) {（不詳）};}{}
+}}
+%
+\ifcase\場所種別
+\or   \draw (65,239.5) circle[radius=2]; %1
+\or   \draw (73.5,239.5) circle[radius=2]; %
+\or   \draw (85,239.5) circle[radius=2]; %3
+  \ifcase\施設別
+  \or \node[anchor=west] at (140,219) {介護医療院};
+  \or \node[anchor=west] at (138,219) {\small 介護老人保健施設};
+  \fi
+\or   \draw (123,239.5) circle[radius=2]; %4
+\or   \draw (134.5,239.5) circle[radius=2]; %5
+\or   \draw (151,239.5) circle[radius=2]; %6
+\or   \draw (160,239.5) circle[radius=2]; %7
+\fi
+
+%
+\node[anchor=west] at (64,230) {\死亡場所};
+\node[anchor=east] at (129,232) {\死亡番地};
+\node[anchor=east] at (129,227.5) {\死亡番};
+\node[anchor=east] at (146,227.5) {\死亡号};
+\node[anchor=west] at (64,219) {\死亡施設名};
+%
+\node[anchor=west] at (64,207) {\死因ア};
+\node[anchor=west] at (146,207) {\ア期間};
+\node[anchor=west] at (64,198) {\原因イ};
+\node[anchor=west] at (146,198) {\イ期間};
+\node[anchor=west] at (64,189) {\原因ウ};
+\node[anchor=west] at (146,189) {\ウ期間};
+\node[anchor=west] at (64,181) {\原因エ};
+\node[anchor=west] at (146,181) {\エ期間};
+\node[anchor=west] at (64,169) {\II欄};
+\node[anchor=west] at (146,169) {\II期間};
+%
+\ifthenelse{\equal{\手術}{2}}{%
+  \draw (55,155.5) circle[radius=2];
+  {\footnotesize \node[anchor=north west, align=left] at (62,161) {\手術所見};}
+  \ifthenelse{\equal{\手術年号}{S}}{
+    \draw (148.5,151) circle[x radius=3, y radius=2.5];  }{
+  \ifthenelse{\equal{\手術年号}{H}}{
+    \draw (148.5,156) circle[x radius=3, y radius=2.5];  }{
+  \ifthenelse{\equal{\手術年号}{R}}{
+    \draw (148.5,160) circle[x radius=3, y radius=2.5];  }{}
+  }}
+  \node[anchor=east] at (156,155.7) {\scriptsize \手術年};
+  \node[anchor=east] at (161.8,155.7) {\scriptsize \手術月};
+  \node[anchor=east] at (167,155.7) {\scriptsize \手術日};
+}{%
+  \ifthenelse{\equal{\手術}{1}}{
+    \draw (46,155.5) circle[radius=2];  }{}
+}
+%
+\ifthenelse{\equal{\解剖}{2}}{%
+  \draw (55,145) circle[radius=2];
+  {\footnotesize \node[anchor=north west, align=left] at (62,148) {\解剖所見};}
+}{%
+  \ifthenelse{\equal{\解剖}{1}}{%
+    \draw (46,145) circle[radius=2];  }{}
+}
+%
+\ifcase\死因種類
+\or \draw (36.5,137) circle[radius=2];     % 1
+\or \draw (77,134) circle[radius=2];       % 2
+\or \draw (92,134) circle[radius=2];       % 3
+\or \draw (110,134) circle[radius=2];      % 4
+\or \draw (120,134) circle[radius=2];      % 5
+\or \draw (77,131) circle[radius=2];       % 6
+\or \draw (87,131) circle[radius=2];       % 7
+\or \draw (98,131) circle[radius=2];       % 8
+\or \draw (88.5,125) circle[radius=2];     % 9
+\or \draw (99.5,125) circle[radius=2];     % 10
+\or \draw (111,125) circle[radius=2];      % 11
+\or \draw (36.5,121.5) circle[radius=2];   % 12
+\fi
+% 
+\ifthenelse{\equal{\発生年号}{S}}{%
+  \draw (70.5,114) circle[x radius=3, y radius=2.5];}{%
+\ifthenelse{\equal{\発生年号}{H}}{%
+  \draw (63.5,114) circle[x radius=3, y radius=2.5];}{%
+\ifthenelse{\equal{\発生年号}{R}}{%
+  \draw (56.5,114) circle[x radius=3, y radius=2.5];}{}
+ }}
+\node[anchor=east] at (80,114) {\発生年};
+\node[anchor=east] at (90,114) {\発生月};
+\node[anchor=east] at (100,114) {\発生日};
+
+\ifthenelse{\equal{\発生AP}{A}}{
+  \draw (108.5,114) circle[x radius=3, y radius=2.5];
+}{
+  \ifthenelse{\equal{\発生AP}{P}}{
+    \draw (115,114) circle[x radius=3, y radius=2.5];
+  }{}
+}
+\node[anchor=east] at (125,114) {\発生時};
+\node[anchor=east] at (137,114) {\発生分};
+\ifcase\発生場所種別
+ \or  \draw (54,105) circle[radius=2]; %1
+ \or  \draw (64,105) circle[radius=2]; %2
+ \or  \draw (88,105) circle[radius=2]; %3
+ \or  \draw (97,105) circle[radius=2]; %4
+  \node[anchor=west] at (112,105) {\small \発生その他};
+\fi
+%
+\node[anchor=west] at (58,96) {\発生都道府県};
+\ifcase\都道府県
+ \or  \draw (76,98) circle[radius=2];
+ \or  \draw (79,98) circle[radius=2];
+ \or  \draw (76.5,93.5) circle[radius=2];
+ \or  \draw (78.5,94) circle[radius=2];
+\fi
+\node[anchor=west] at (85,96) {\発生市郡};
+\ifcase\市郡
+ \or  \draw (108,98) circle[radius=2]; %1
+ \or  \draw (108,94) circle[radius=2]; %2
+\fi
+\node[anchor=west] at (115,96) {\発生区町村};
+\ifcase\区町村
+ \or  \draw (133,98) circle[radius=2]; %1
+ \or  \draw (132,94) circle[radius=2]; %2
+ \or  \draw (134,94) circle[radius=2]; %3
+\fi
+\node[anchor=west] at (37,86) {\発生手段状況};
+%
+\node[anchor=west] at (50,78) {\出生時体重};
+\ifthenelse{\equal{\胎児数}{1}}{
+  \draw (97,78) circle[radius=2];
+}{
+  \ifthenelse{\equal{\胎児数}{2}}{
+    \draw (107,78) circle[radius=2];
+    \node[anchor=east] at (118,78.5) {\多胎数};
+    \node[anchor=east] at (131,78.5) {\第x子};
+  }{}
+}
+\node[anchor=east] at (163,78.5) {\妊娠週数};
+\ifcase\母体病態
+\or  \draw (36,64) circle[radius=2];
+\or  \draw (42,64) circle[radius=2];
+  {\small \node[anchor=north west, align=left] at (50,72) {\母体詳細};}
+\or  \draw (94,64) circle[radius=2];
+\fi
+\ifthenelse{\equal{\母生年号}{S}}{
+  \draw (103.5,68) circle[x radius=3, y radius=2];}{
+ \ifthenelse{\equal{\母生年号}{H}}{
+    \draw (103.5,64) circle[x radius=3, y radius=2];}{
+  \ifthenelse{\equal{\母生年号}{R}}{
+      \draw (103.5,60) circle[x radius=3, y radius=2];}{}
+  }
+}
+\node[anchor=east] at (118,64) {\母生年};
+\node[anchor=east] at (125.5,64) {\母生月};
+\node[anchor=east] at (132.5,64) {\母生日};
+\node[anchor=east] at (160,69) {\出生児数};
+\node[anchor=east] at (160,65) {\死産児数};
+%
+\node[anchor=west] at (10,50) {\付言};
+\node[anchor=east] at (145,44.5) {\診断年};
+\node[anchor=east] at (154.5,44.5) {\診断月};
+\node[anchor=east] at (163.5,44.5) {\診断日};
+\node[anchor=east] at (145,40.5) {\発行年};
+\node[anchor=east] at (154.5,40.5) {\発行月};
+\node[anchor=east] at (163.5,40.5) {\発行日};
+%
+\node[anchor=west] at (60,33) {\発行者住所};
+\node[anchor=east] at (136,36) {\発行者番地};
+\node[anchor=east] at (136,32) {\発行者番};
+\node[anchor=east] at (150,32) {\発行者号};
+\node[anchor=west] at (60,27) {\発行者施設};
+}%body
+
+\newif\if用紙のみ\用紙のみfalse\def\用紙のみ{\用紙のみtrue}
+
